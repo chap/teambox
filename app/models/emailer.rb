@@ -2,7 +2,7 @@ class Emailer < ActionMailer::Base
   include ActionController::UrlWriter # Allows us to generate URLs
   include ActionView::Helpers::TextHelper
   include Emailer::Incoming
-  
+
   # can't use regular `receive` class method since it deals with Mail objects
   def self.receive_params(params)
     new.receive(params)
@@ -38,7 +38,7 @@ class Emailer < ActionMailer::Base
     subject       I18n.t("emailer.invitation.subject", :user => invitation.user.name, :project => invitation.project.name)
     body          :referral => invitation.user, :project => invitation.project, :invitation => invitation
   end
-  
+
   def signup_invitation(invitation)
     defaults
     recipients    invitation.email
@@ -47,7 +47,7 @@ class Emailer < ActionMailer::Base
   end
 
   def notify_conversation(user, project, conversation)
-    title = conversation.name.blank? ? 
+    title = conversation.name.blank? ?
               truncate(conversation.comments.first(:order => 'id ASC').body.strip) :
               conversation.name
     defaults
@@ -65,20 +65,28 @@ class Emailer < ActionMailer::Base
     body          :project => project, :task => task, :task_list => task.task_list, :recipient => user
   end
 
+  def project_membership_notification(invitation)
+    defaults
+    recipients    invitation.invited_user.email
+    from_reply_to "#{invitation.project.permalink}", invitation.user
+    subject       I18n.t("emailer.project_membership_notification.subject", :user => invitation.user.name, :project => invitation.project.name)
+    body          :project => invitation.project, :recipient => invitation.invited_user
+  end
+
   def daily_task_reminder(user)
     tasks = user.tasks_for_daily_reminder_email
-    
+
     defaults
     recipients    user.email
     subject       I18n.t("users.daily_task_reminder_email.daily_task_reminder")
     body          :user => user, :tasks => tasks
   end
-  
+
   def bounce_message(exception)
     defaults
     pretty_exception = exception.class.name.underscore.split('/').last
     info_url = 'http://help.teambox.com/faqs/advanced-features/email'
-    
+
     recipients    exception.mail.from
     subject       I18n.t("emailer.bounce.subject")
     body          I18n.t("emailer.bounce.#{pretty_exception}") + "\n\n---\n" +
@@ -99,7 +107,7 @@ class Emailer < ActionMailer::Base
       task = Task.find_by_name "Contact area businesses for banner exchange"
       Emailer.create_notify_task(task.user, task.project, task)
     end
-    
+
     def notify_conversation
       conversation = Conversation.find_by_name "Seth Godin's 'What matters now'"
       Emailer.create_notify_conversation(conversation.user, conversation.project, conversation)
@@ -113,19 +121,19 @@ class Emailer < ActionMailer::Base
       reply_address = from_user(reply_identifier, nil)
       reply_to reply_address unless reply_address.starts_with?("no-reply")
     end
-    
+
     def from_user(reply_identifier, user)
       unless Teambox.config.allow_incoming_email and reply_identifier
         reply_identifier = "no-reply"
       end
-      
+
       from_address(reply_identifier, user.try(:name))
     end
 
     def from_address(recipient = "no-reply", name = "Teambox")
       domain = Teambox.config.smtp_settings[:domain]
       address = "#{recipient}@#{domain}"
-      
+
       if name.blank? or Teambox.config.smtp_settings[:safe_from]
         address
       else

@@ -94,7 +94,7 @@ en:
     create_project:
       left: created the project
       title: "%{person} created the project %{project}"
-      
+
     thread:
       on_task_list: "on"
       more_comments:
@@ -1019,7 +1019,7 @@ en:
       close: Hide preview
       preview: Preview
       showing: "..."
-      
+
   example_projects:
     new:
       learn: Learn by example!
@@ -1260,6 +1260,10 @@ en:
     common:
       do_not_answer: "Do not reply to this email."
       answer_above_this_line: "REPLY ABOVE THIS LINE TO POST AN ANSWER"
+    project_membership_notification:
+      subject: "%{user} shared [%{project}] with you"
+      you_have_been_added_to: "You are now a member of the project <b> %{project}</b>"
+      project_link: "Click on the link below to start collaborating on <b> %{project}</b> now"
     invitation:
       subject: "%{user} shared [%{project}] with you"
       collaborate_with: "%{name} wants to collaborate with you on Teambox:"
@@ -1287,7 +1291,7 @@ en:
       plaintext_link: "If this doesn't work, copy and paste the following link in your browser's bar:"
       report_abuse: "You received this message because you signed up for a Teambox account with %{email}"
       problems: "If you have any problems, please contact us at %{support}"
-      successfully_reset: "Your password has been successfully reset." 
+      successfully_reset: "Your password has been successfully reset."
     forgot_password:
       subject: "Password retrieval for Teambox"
     notify:
